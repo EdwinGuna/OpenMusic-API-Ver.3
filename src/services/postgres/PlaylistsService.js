@@ -38,7 +38,7 @@ class PlaylistsService {
         _playlists
       }
     } catch (error) {
-      /*const query = {
+      const query = {
         text: `
           SELECT playlists.id, playlists.name, users.username 
           FROM playlists
@@ -49,25 +49,8 @@ class PlaylistsService {
           WHERE playlists.owner = $1 OR collaborations.user_id = $1
         `,
         values: [owner],
-      };*/
-      const query = {
-        text: `SELECT p.id, p.name, u.username
-        FROM playlists p
-        INNER JOIN users u
-        ON p.owner = u.id
-        WHERE p.owner = $1
-  
-        UNION
-        
-        SELECT p.id, p.name, u.username
-        FROM collaborations c
-        INNER JOIN playlists p
-        ON c.playlist_id = p.id
-        INNER JOIN users u
-        ON p.owner = u.id
-        WHERE c.user_id = $1`,
-        values: [owner]
-      }
+      };
+      
       const result = await this._pool.query(query);
 
       await this._cacheService.set(`playlist:${owner}`, JSON.stringify(result.rows));
